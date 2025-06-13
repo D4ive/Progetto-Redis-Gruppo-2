@@ -1,7 +1,8 @@
 import redis
 import __init__
+import utils
 
-r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+r = utils.connection()
 
 def chiedi_ruolo():
     while True:
