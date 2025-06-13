@@ -1,15 +1,19 @@
 import redis
-import __init__
 import utils
 
 r = utils.connection()
 
 def chiedi_ruolo():
     while True:
-        ruolo = input("Sei un produttore o un consumatore? [produttore/consumatore]: ").strip().lower()
-        if ruolo in ("produttore", "consumatore"):
-            return ruolo
-        print("Ruolo non valido. Riprova.")
+        scelta = input("Sei un produttore o un consumatore? [1/2]: ").strip().lower()
+        if scelta == "1":
+            ruolo = "produttore"
+        elif scelta == "2":
+            ruolo = "consumatore"
+        else:
+            print("Scelta non valida. Riprova.")
+            continue
+        return ruolo
 
 def mostra_utenti_registrati():
     utenti = r.smembers("utenti:registrati")
