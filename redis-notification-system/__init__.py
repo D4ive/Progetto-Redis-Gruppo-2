@@ -1,7 +1,7 @@
-from app.auth import menu as auth_menu
+# from app.auth import menu as auth_menu
 
-def main():
-    auth_menu()
+# def main():
+#     auth_menu()
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
