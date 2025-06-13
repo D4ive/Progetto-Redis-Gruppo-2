@@ -1,7 +1,7 @@
-import redis
-from . import utils
+import __init__
+import database as db
 
-r = utils.connection()
+r = db.connection()
 
 def chiedi_ruolo():
     while True:
