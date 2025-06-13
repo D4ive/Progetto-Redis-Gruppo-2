@@ -1,4 +1,3 @@
-import redis
 import database as db
 
 r = db.connection()

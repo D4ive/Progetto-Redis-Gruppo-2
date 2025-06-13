@@ -1,6 +1,20 @@
-# redis-notification-system/__init__.py
-from .auth.auth import menu  # Assuming the menu function is in auth.py
+import subprocess
+import os
 
 def main():
-    """Entry point for the application"""
-    menu()
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    consumer_path = os.path.join(base_dir, "consumer.py")
+    producer_path = os.path.join(base_dir, "producer.py")
+
+    # Start consumer.py in a new terminal window
+    subprocess.Popen(
+        f'start cmd /k python "{consumer_path}"',
+        shell=True
+    )
+
+    # Start producer.py in a new terminal window
+    subprocess.Popen(
+        f'start cmd /k python "{producer_path}"',
+        shell=True
+    )
