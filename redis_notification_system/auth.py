@@ -1,5 +1,5 @@
 import redis
-import utils
+from . import utils
 
 r = utils.connection()
 

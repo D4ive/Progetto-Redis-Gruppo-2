@@ -1,10 +1,9 @@
 import redis
 import json
 import time
-import utils
 from auth import login_utente, registra_utente
 
-r = utils.connection()
+r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 print("--- PRODUTTORE DI NOTIFICHE ---")
 scelta = input("1. Registrati\n2. Login\nScegli un'opzione: ").strip()
