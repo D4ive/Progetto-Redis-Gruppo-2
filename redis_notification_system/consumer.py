@@ -2,9 +2,10 @@ import redis
 import json
 import threading
 import time
+import database as db
 from auth import login_utente, registra_utente
 
-r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+r = db.connection()
 
 print("--- CONSUMATORE DI NOTIFICHE ---")
 scelta = input("1. Registrati\n2. Login\nScegli un'opzione: ").strip()

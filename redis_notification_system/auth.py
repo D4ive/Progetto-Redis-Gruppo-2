@@ -1,4 +1,4 @@
-import __init__
+import redis
 import database as db
 
 r = db.connection()
@@ -62,13 +62,3 @@ def login_utente():
         return None, None
     print(f"Login effettuato. Benvenuto {username} ({ruolo})!")
     return username, ruolo
-
-if __name__ == "__main__":
-    print("1. Registrati\n2. Login")
-    scelta = input("Scegli un'opzione: ")
-    if scelta == "1":
-        registra_utente()
-    elif scelta == "2":
-        login_utente()
-    else:
-        print("Opzione non valida.")
