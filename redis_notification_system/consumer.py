@@ -6,20 +6,25 @@ from auth import login_utente, registra_utente
 
 r = db.connection()
 
-print("--- CONSUMATORE DI NOTIFICHE ---")
-scelta = input("1. Registrati\n2. Login\nScegli un'opzione: ").strip()
-if scelta == "1":
-    risultato = registra_utente()
-    if risultato is None:
-        exit()
-    username, ruolo = risultato
-elif scelta == "2":
-    username, ruolo = login_utente()
-    if ruolo is None:
-        exit()
-else:
-    print("Scelta non valida.")
-    exit()
+# Menu con gestione errori
+while True:
+    print("--- CONSUMATORE DI NOTIFICHE ---")
+    scelta = input("1. Registrati\n2. Login\nScegli un'opzione: ").strip()
+    
+    if scelta == "1":
+        risultato = registra_utente("consumatore")
+        if risultato is None:
+            continue  # Torna al menu invece di exit
+        username, ruolo = risultato
+        break
+    elif scelta == "2":
+        username, ruolo = login_utente()
+        if ruolo is None:
+            continue  # Torna al menu invece di exit
+        break
+    else:
+        print("Scelta non valida. Riprova.")
+        continue  # Continua il loop invece di exit
 
 if ruolo != "consumatore":
     print("Accesso non autorizzato. Solo i consumatori possono ricevere notifiche.")

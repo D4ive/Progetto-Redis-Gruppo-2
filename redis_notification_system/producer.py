@@ -5,20 +5,25 @@ from auth import login_utente, registra_utente
 
 r = db.connection()
 
-print("--- PRODUTTORE DI NOTIFICHE ---")
-scelta = input("1. Registrati\n2. Login\nScegli un'opzione: ").strip()
-if scelta == "1":
-    risultato = registra_utente()
-    if risultato is None:
-        exit()
-    username, ruolo = risultato
-elif scelta == "2":
-    username, ruolo = login_utente()
-    if ruolo is None:
-        exit()
-else:
-    print("Scelta non valida.")
-    exit()
+# Menu con gestione errori
+while True:
+    print("--- PRODUTTORE DI NOTIFICHE ---")
+    scelta = input("1. Registrati\n2. Login\nScegli un'opzione: ").strip()
+    
+    if scelta == "1":
+        risultato = registra_utente("produttore")
+        if risultato is None:
+            continue  # Torna al menu invece di exit
+        username, ruolo = risultato
+        break
+    elif scelta == "2":
+        username, ruolo = login_utente()
+        if ruolo is None:
+            continue  # Torna al menu invece di exit
+        break
+    else:
+        print("Scelta non valida. Riprova.")
+        continue  # Continua il loop invece di exit
 
 if ruolo != "produttore":
     print("Accesso non autorizzato. Solo i produttori possono inviare notifiche.")
@@ -41,5 +46,3 @@ while True:
     r.rpush(f"notifiche:{canale}", json.dumps(notifica))
     r.expire(f"notifiche:{canale}", 3600 * 6)
     print(f"Notifica inviata su '{canale}'")
-
-#TODO: quyando viene invaita una notif a con un nuovo canale, creare il canale se non esiste
