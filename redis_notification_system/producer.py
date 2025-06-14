@@ -36,7 +36,10 @@ while True:
         "autore": username
     }
 
+    db.aggiungi_canali([canale])
     r.publish(canale, json.dumps(notifica))
     r.rpush(f"notifiche:{canale}", json.dumps(notifica))
     r.expire(f"notifiche:{canale}", 3600 * 6)
     print(f"Notifica inviata su '{canale}'")
+
+#TODO: quyando viene invaita una notif a con un nuovo canale, creare il canale se non esiste
