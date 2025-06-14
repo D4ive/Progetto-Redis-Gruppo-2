@@ -26,3 +26,37 @@ def crea_notifica(canale, notifica):
     
     r.expire(f"notifiche:{canale}", 3600 * 6)
     return True
+
+# Funzioni aggiunte per gestire canali e iscrizioni
+def ottieni_canali_disponibili():
+    r = connection()
+    canali = list(r.smembers('elenco_canali'))
+    return sorted(canali) if canali else []
+
+def ottieni_canali_utente(username):
+    r = connection()
+    key_sottoscrizioni = f"sottoscrizioni:{username}"
+    canali = list(r.smembers(key_sottoscrizioni))
+    return sorted(canali) if canali else []
+
+def iscriviti_canale(username, canale):
+    r = connection()
+    key_sottoscrizioni = f"sottoscrizioni:{username}"
+    
+    if not r.sismember('elenco_canali', canale):
+        return False
+    if r.sismember(key_sottoscrizioni, canale):
+        return False
+    
+    r.sadd(key_sottoscrizioni, canale)
+    return True
+
+def disiscriviti_canale(username, canale):
+    r = connection()
+    key_sottoscrizioni = f"sottoscrizioni:{username}"
+    
+    if not r.sismember(key_sottoscrizioni, canale):
+        return False
+    
+    r.srem(key_sottoscrizioni, canale)
+    return True
