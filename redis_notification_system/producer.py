@@ -1,4 +1,3 @@
-import json
 import time
 import database as db
 from auth import login_utente, registra_utente
@@ -41,8 +40,5 @@ while True:
         "autore": username
     }
 
-    db.aggiungi_canali([canale])
-    r.publish(canale, json.dumps(notifica))
-    r.rpush(f"notifiche:{canale}", json.dumps(notifica))
-    r.expire(f"notifiche:{canale}", 3600 * 6)
-    print(f"Notifica inviata su '{canale}'")
+    notifica = db.crea_notifica(canale, notifica)
+    if notifica: print(f"Notifica inviata su '{canale}'")
