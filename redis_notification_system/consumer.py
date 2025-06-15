@@ -129,7 +129,27 @@ while True:
                 for raw in recenti:
                     try:
                         dati = json.loads(raw)
-                        print(f"  📩 {dati['titolo']} - {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')})")
+                        
+                        # Calcola tempo trascorso anche per le notifiche storiche
+                        tempo_fa = "ora"  # Default
+                        timestamp = dati.get('timestamp')
+                        if timestamp:
+                            try:
+                                ora_attuale = time.time()
+                                secondi_passati = ora_attuale - float(timestamp)
+                                ore = int(secondi_passati // 3600)
+                                minuti = int((secondi_passati % 3600) // 60)
+                                
+                                if ore > 0:
+                                    tempo_fa = f"{ore}h fa"
+                                elif minuti > 0:
+                                    tempo_fa = f"{minuti}m fa"
+                                else:
+                                    tempo_fa = "ora"
+                            except (ValueError, TypeError):
+                                tempo_fa = "ora"
+                        
+                        print(f"  📩 {dati['titolo']} - {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')}, {tempo_fa})")
                     except:
                         pass
 
@@ -147,23 +167,31 @@ while True:
                         try:
                             dati = json.loads(msg['data'])
                             canale = msg['channel']
-    
+
+                            # Gestione timestamp migliorata
+                            tempo_fa = "ora"  # Default
                             timestamp = dati.get('timestamp')
                             if timestamp:
-                                ora_attuale = time.time()
-                                secondi_passati = ora_attuale - timestamp
-                                ore = int(secondi_passati // 3600)
-                                minuti = int((secondi_passati % 3600) // 60)
-                                if ore > 0:
-                                    tempo_fa = f"{ore}h fa"
-                                elif minuti > 0:
-                                    tempo_fa = f"{minuti}m fa"
-                                else:
-                                    tempo_fa = "ora"
+                                try:
+                                    ora_attuale = time.time()
+                                    secondi_passati = ora_attuale - float(timestamp)
+                                    ore = int(secondi_passati // 3600)
+                                    minuti = int((secondi_passati % 3600) // 60)
+                                    
+                                    if ore > 0:
+                                        tempo_fa = f"{ore}h fa"
+                                    elif minuti > 0:
+                                        tempo_fa = f"{minuti}m fa"
+                                    else:
+                                        tempo_fa = "ora"
+                                except (ValueError, TypeError):
+                                    tempo_fa = "ora"  # Fallback se timestamp non valido
 
                             print(f"\n📩🔔 [{canale}] {dati['titolo']}: {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')}, {tempo_fa})")
-                        except:
-                            pass
+                        except json.JSONDecodeError:
+                            pass  # Ignora messaggi malformati
+                        except KeyError:
+                            pass  # Ignora messaggi senza campi richiesti
             except:
                 pass  # Ignora errori di connessione chiusa
 
