@@ -101,7 +101,7 @@ while True:
         key_sottoscrizioni = f"sottoscrizioni:{username}"
         
         # Se non ha sottoscrizioni, chiede di inserirle
-        if not r.exists(key_sottoscrizioni):
+        if not db.ottieni_canali_utente(username):
             print("\n❌ Nessun canale sottoscritto.")
             print("\n📺 Canali disponibili:")
             print(db.mostra_canali_gerarchici())
@@ -109,7 +109,7 @@ while True:
             for c in canali_input:
                 c = c.strip()
                 if c in db.ottieni_canali_disponibili():
-                    r.sadd(key_sottoscrizioni, c)
+                    db.iscriviti_canale(username, c)
             print("✅ Canali sottoscritti salvati.")
 
         # Usa la funzione gerarchica per ottenere tutti i canali da ascoltare

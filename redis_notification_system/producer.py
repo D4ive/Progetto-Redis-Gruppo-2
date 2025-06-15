@@ -70,20 +70,9 @@ while True:
         }
 
         db.aggiungi_canali([canale])
-        r.publish(canale, json.dumps(notifica))
-        r.rpush(f"notifiche:{canale}", json.dumps(notifica))
-        r.expire(f"notifiche:{canale}", 3600 * 24)
+        db.crea_notifica(canale, notifica)
         print(f"✅ Notifica inviata su '{canale}'")
-        
-        # Mostra quanti utenti potrebbero riceverla
-        tutti_utenti = r.keys("sottoscrizioni:*")
-        ricevitori = 0
-        for utente_key in tutti_utenti:
-            username_utente = utente_key.split(":")[1]
-            canali_ascolto = db.ottieni_canali_ascolto(username_utente)
-            if canale in canali_ascolto:
-                ricevitori += 1
-        print(f"📊 Potenziali ricevitori: {ricevitori}")
+        print(f"📊 Potenziali ricevitori: {db.conta_potenziali_ricevitori(canale)}")
     
     else:
         print("❌ Scelta non valida.")

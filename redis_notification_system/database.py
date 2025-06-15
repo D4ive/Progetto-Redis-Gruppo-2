@@ -100,8 +100,13 @@ def ottieni_canali_utente(username):
     """Restituisce i canali a cui un utente è iscritto"""
     r = connection()
     key_sottoscrizioni = f"sottoscrizioni:{username}"
-    canali = list(r.smembers(key_sottoscrizioni))
-    return sorted(canali) if canali else []
+    if r.exists(key_sottoscrizioni):
+        print("Entra qui")
+        canali = list(r.smembers(key_sottoscrizioni))
+        return sorted(canali) if canali else []
+    else:
+        print("Entra quo")
+        return False
 
 def ottieni_canali_ascolto(username):
     """Restituisce tutti i canali che l'utente deve ascoltare (incluse sottocategorie)"""
