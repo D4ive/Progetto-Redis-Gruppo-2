@@ -112,17 +112,25 @@ while True:
         pubsub = r.pubsub()
         pubsub.subscribe(*canali)
 
+        stop_listening = threading.Event()
+        
         def ascolta():
-            for msg in pubsub.listen():
-                if msg['type'] == 'message':
-                    try:
-                        dati = json.loads(msg['data'])
-                        canale = msg['channel']
-                        print(f"\n📩 [{canale}] {dati['titolo']}: {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')})")
-                    except:
-                        pass
+            try:
+                for msg in pubsub.listen():
+                    if stop_listening.is_set():
+                        break
+                    if msg['type'] == 'message':
+                        try:
+                            dati = json.loads(msg['data'])
+                            canale = msg['channel']
+                            print(f"\n📩 [{canale}] {dati['titolo']}: {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')})")
+                        except:
+                            pass
+            except:
+                pass  # Ignora errori di connessione chiusa
 
-        threading.Thread(target=ascolta, daemon=True).start()
+        listener_thread = threading.Thread(target=ascolta, daemon=True)
+        listener_thread.start()
 
         try:
             print("Ascolto notifiche... (Ctrl+C per tornare al menu)")
@@ -130,6 +138,7 @@ while True:
                 time.sleep(1)
         except KeyboardInterrupt:
             print("\nTornato al menu.")
+            stop_listening.set()
             pubsub.close()
     
     else:
