@@ -158,17 +158,19 @@ def crea_notifica(canale, notifica):
     """Crea e pubblica una notifica su un canale"""
     r = connection()
     aggiungi_canali([canale])
-    r.publish(canale, json.dumps(notifica))
-
-    r.hset(name=f"notifiche:{canale}", 
-           mapping={"titolo": notifica["titolo"],
-                    "messaggio": notifica["messaggio"],
-                    "timestamp": notifica["timestamp"],
-                    "autore": notifica["autore"]
-                    }
-    )
     
+    # Pubblica per gli ascoltatori in tempo reale
+    r.publish(canale, json.dumps(notifica))
+    
+    # Salva nella lista delle notifiche recenti (usando LPUSH per aggiungere all'inizio)
+    r.lpush(f"notifiche:{canale}", json.dumps(notifica))
+    
+    # Mantieni solo le ultime 10 notifiche per canale
+    r.ltrim(f"notifiche:{canale}", 0, 9)
+    
+    # Imposta scadenza per pulizia automatica (6 ore)
     r.expire(f"notifiche:{canale}", 3600 * 6)
+    
     return True
 
 def conta_potenziali_ricevitori(canale):
@@ -186,8 +188,11 @@ def conta_potenziali_ricevitori(canale):
     return ricevitori
 
 def ottieni_recenti(canale):
+    """Restituisce le ultime notifiche di un canale"""
     r = connection()
-    return r.lrange(f"notifiche:{canale}", -3, -1)
+    # Usa LRANGE per ottenere le ultime 3 notifiche (dalla lista)
+    notifiche_raw = r.lrange(f"notifiche:{canale}", 0, 2)  # Prende le prime 3 (le più recenti)
+    return notifiche_raw if notifiche_raw else []
 
 def get_pubsub():
     """Restituisce un oggetto PubSub per ascoltare i canali"""
