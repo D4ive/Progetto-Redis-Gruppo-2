@@ -123,7 +123,7 @@ while True:
         # mostra ultime notifiche
         print("\n--- ULTIME NOTIFICHE ---")
         for c in canali:
-            recenti = r.lrange(f"notifiche:{c}", -3, -1)
+            recenti = db.ottieni_recenti(c)
             if recenti:
                 print(f"\n[{c}]:")
                 for raw in recenti:
@@ -133,7 +133,7 @@ while True:
                     except:
                         pass
 
-        pubsub = r.pubsub()
+        pubsub = db.get_pubsub()
         pubsub.subscribe(*canali)
 
         stop_listening = threading.Event()
