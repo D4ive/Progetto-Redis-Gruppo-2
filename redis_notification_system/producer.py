@@ -38,19 +38,27 @@ while True:
     
     if scelta == "1":
         # Crea nuovo canale
-        print("\nCanali esistenti:", db.ottieni_canali_disponibili())
-        nuovo_canale = input("Nome nuovo canale: ").strip()
+        print("\n" + db.mostra_canali_gerarchici())
+        print("\n💡 Esempi di canali gerarchici:")
+        print("  - sport (canale principale)")
+        print("  - sport.calcio (sottocategoria)")
+        print("  - sport.calcio.serieA (sotto-sottocategoria)")
+        nuovo_canale = input("\nNome nuovo canale: ").strip()
         if nuovo_canale:
             if nuovo_canale not in db.ottieni_canali_disponibili():
                 db.aggiungi_canali([nuovo_canale])
-                print(f"Canale '{nuovo_canale}' creato.")
+                print(f"✅ Canale '{nuovo_canale}' creato.")
             else:
-                print("Canale già esistente.")
+                print("❌ Canale già esistente.")
         
     elif scelta == "2":
         # Invia notifica (logica originale)
-        print("\nCanali disponibili:", db.ottieni_canali_disponibili())
-        canale = input("Canale (es. sport.calcio): ").strip()
+        print("\n" + db.mostra_canali_gerarchici())
+        canale = input("\nCanale (es. sport.calcio): ").strip()
+        if canale not in db.ottieni_canali_disponibili():
+            print("❌ Canale non esistente. Crealo prima.")
+            continue
+            
         titolo = input("Titolo: ").strip()
         messaggio = input("Messaggio: ").strip()
 
@@ -65,7 +73,17 @@ while True:
         r.publish(canale, json.dumps(notifica))
         r.rpush(f"notifiche:{canale}", json.dumps(notifica))
         r.expire(f"notifiche:{canale}", 3600 * 24)
-        print(f"Notifica inviata su '{canale}'")
+        print(f"✅ Notifica inviata su '{canale}'")
+        
+        # Mostra quanti utenti potrebbero riceverla
+        tutti_utenti = r.keys("sottoscrizioni:*")
+        ricevitori = 0
+        for utente_key in tutti_utenti:
+            username_utente = utente_key.split(":")[1]
+            canali_ascolto = db.ottieni_canali_ascolto(username_utente)
+            if canale in canali_ascolto:
+                ricevitori += 1
+        print(f"📊 Potenziali ricevitori: {ricevitori}")
     
     else:
-        print("Scelta non valida.")
+        print("❌ Scelta non valida.")
