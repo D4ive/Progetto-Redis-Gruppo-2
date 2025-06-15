@@ -118,7 +118,21 @@ while True:
                     try:
                         dati = json.loads(msg['data'])
                         canale = msg['channel']
-                        print(f"\n📩 [{canale}] {dati['titolo']}: {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')})")
+
+                        timestamp = dati.get('timestamp')
+                        if timestamp:
+                            ora_attuale = time.time()
+                            secondi_passati = ora_attuale - timestamp
+                            ore = int(secondi_passati // 3600)
+                            minuti = int((secondi_passati % 3600) // 60)
+                            if ore > 0:
+                                tempo_fa = f"{ore}h fa"
+                            elif minuti > 0:
+                                tempo_fa = f"{minuti}m fa"
+                            else:
+                                tempo_fa = "ora"
+
+                        print(f"\n📩 [{canale}] {dati['titolo']}: {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')}, {tempo_fa})")
                     except:
                         pass
 

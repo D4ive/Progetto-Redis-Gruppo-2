@@ -64,7 +64,7 @@ while True:
         db.aggiungi_canali([canale])
         r.publish(canale, json.dumps(notifica))
         r.rpush(f"notifiche:{canale}", json.dumps(notifica))
-        r.expire(f"notifiche:{canale}", 3600 * 6)
+        r.expire(f"notifiche:{canale}", 3600 * 24)
         print(f"Notifica inviata su '{canale}'")
     
     else:
