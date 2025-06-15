@@ -45,69 +45,93 @@ while True:
         # Mostra canali iscritto
         canali_iscritto = db.ottieni_canali_utente(username)
         if canali_iscritto:
-            print(f"Canali iscritto: {canali_iscritto}")
+            print(f"\n📋 Canali a cui sei iscritto:")
+            for canale in canali_iscritto:
+                print(f"  • {canale}")
+            
+            # Mostra anche cosa riceverà effettivamente
+            canali_ascolto = db.ottieni_canali_ascolto(username)
+            sottocategorie = [c for c in canali_ascolto if c not in canali_iscritto]
+            if sottocategorie:
+                print(f"\n📺 Riceverai anche notifiche da queste sottocategorie:")
+                for canale in sottocategorie:
+                    print(f"  └── {canale}")
         else:
-            print("Non sei iscritto a nessun canale.")
+            print("❌ Non sei iscritto a nessun canale.")
     
     elif scelta == "2":
         # Mostra canali disponibili
-        canali_disponibili = db.ottieni_canali_disponibili()
-        if canali_disponibili:
-            print(f"Canali disponibili: {canali_disponibili}")
-        else:
-            print("Nessun canale disponibile.")
+        print("\n📺 Canali disponibili:")
+        print(db.mostra_canali_gerarchici())
+        print("\n💡 Iscrivendoti a 'sport' riceverai anche notifiche da 'sport.calcio', 'sport.tennis', ecc.")
     
     elif scelta == "3":
         # Iscriviti a canale
-        canali_disponibili = db.ottieni_canali_disponibili()
-        print(f"Canali disponibili: {canali_disponibili}")
-        canale = input("Canale a cui iscriversi: ").strip()
+        print("\n📺 Canali disponibili:")
+        print(db.mostra_canali_gerarchici())
+        canale = input("\nCanale a cui iscriversi: ").strip()
         if db.iscriviti_canale(username, canale):
-            print(f"Iscritto a '{canale}'.")
+            print(f"✅ Iscritto a '{canale}'.")
+            
+            # Mostra sottocategorie che riceverà
+            canali_ascolto = db.ottieni_canali_ascolto(username)
+            sottocategorie = [c for c in canali_ascolto if c.startswith(canale + ".")]
+            if sottocategorie:
+                print(f"📺 Riceverai anche notifiche da: {', '.join(sottocategorie)}")
         else:
-            print("Canale non esistente o già iscritto.")
+            print("❌ Canale non esistente o già iscritto.")
     
     elif scelta == "4":
         # Disiscriviti da canale
         canali_iscritto = db.ottieni_canali_utente(username)
-        print(f"Canali iscritto: {canali_iscritto}")
-        canale = input("Canale da cui disiscriversi: ").strip()
-        if db.disiscriviti_canale(username, canale):
-            print(f"Disiscritto da '{canale}'.")
+        if canali_iscritto:
+            print(f"\n📋 Canali a cui sei iscritto:")
+            for canale in canali_iscritto:
+                print(f"  • {canale}")
+            canale = input("\nCanale da cui disiscriversi: ").strip()
+            if db.disiscriviti_canale(username, canale):
+                print(f"✅ Disiscritto da '{canale}'.")
+            else:
+                print("❌ Non sei iscritto a questo canale.")
         else:
-            print("Non sei iscritto a questo canale.")
+            print("❌ Non sei iscritto a nessun canale.")
     
     elif scelta == "5":
-        # Inizia ascolto (logica originale modificata)
+        # Inizia ascolto (logica originale modificata per gerarchia)
         key_sottoscrizioni = f"sottoscrizioni:{username}"
         
         # Se non ha sottoscrizioni, chiede di inserirle
         if not r.exists(key_sottoscrizioni):
-            print("\nNessun canale sottoscritto.")
-            print("Canali disponibili:", db.ottieni_canali_disponibili())
-            canali_input = input("Inserisci i canali separati da virgola: ").split(',')
+            print("\n❌ Nessun canale sottoscritto.")
+            print("\n📺 Canali disponibili:")
+            print(db.mostra_canali_gerarchici())
+            canali_input = input("\nInserisci i canali separati da virgola: ").split(',')
             for c in canali_input:
                 c = c.strip()
                 if c in db.ottieni_canali_disponibili():
                     r.sadd(key_sottoscrizioni, c)
-            print("Canali sottoscritti salvati.")
+            print("✅ Canali sottoscritti salvati.")
 
-        canali = list(r.smembers(key_sottoscrizioni))
+        # Usa la funzione gerarchica per ottenere tutti i canali da ascoltare
+        canali = db.ottieni_canali_ascolto(username)
         if not canali:
-            print("Nessun canale valido sottoscritto.")
+            print("❌ Nessun canale valido sottoscritto.")
             continue
             
-        print(f"\nSottoscritto ai canali: {canali}")
+        print(f"\n🎧 Ascolterò i canali: {canali}")
 
         # mostra ultime notifiche
+        print("\n--- ULTIME NOTIFICHE ---")
         for c in canali:
-            recenti = r.lrange(f"notifiche:{c}", -5, -1)
-            for raw in recenti:
-                try:
-                    dati = json.loads(raw)
-                    print(f"[{c}] {dati['titolo']} - {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')})")
-                except:
-                    pass
+            recenti = r.lrange(f"notifiche:{c}", -3, -1)
+            if recenti:
+                print(f"\n[{c}]:")
+                for raw in recenti:
+                    try:
+                        dati = json.loads(raw)
+                        print(f"  📩 {dati['titolo']} - {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')})")
+                    except:
+                        pass
 
         pubsub = r.pubsub()
         pubsub.subscribe(*canali)
@@ -123,7 +147,7 @@ while True:
                         try:
                             dati = json.loads(msg['data'])
                             canale = msg['channel']
-                            print(f"\n📩 [{canale}] {dati['titolo']}: {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')})")
+                            print(f"\n🔔 [{canale}] {dati['titolo']}: {dati['messaggio']} (da {dati.get('autore', 'sconosciuto')})")
                         except:
                             pass
             except:
@@ -133,13 +157,13 @@ while True:
         listener_thread.start()
 
         try:
-            print("Ascolto notifiche... (Ctrl+C per tornare al menu)")
+            print("📱 Ascolto notifiche... (Ctrl+C per tornare al menu)")
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            print("\nTornato al menu.")
+            print("\n👋 Tornato al menu.")
             stop_listening.set()
             pubsub.close()
     
     else:
-        print("Scelta non valida.")
+        print("❌ Scelta non valida.")
