@@ -1,4 +1,3 @@
-import json
 import time
 import database as db
 from auth import login_utente, registra_utente
