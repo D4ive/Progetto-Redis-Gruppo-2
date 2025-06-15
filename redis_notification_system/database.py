@@ -184,3 +184,12 @@ def conta_potenziali_ricevitori(canale):
             ricevitori += 1
     
     return ricevitori
+
+def ottieni_recenti(canale):
+    r = connection()
+    return r.lrange(f"notifiche:{canale}", -3, -1)
+
+def get_pubsub():
+    """Restituisce un oggetto PubSub per ascoltare i canali"""
+    r = connection()
+    return r.pubsub()
