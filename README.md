@@ -193,12 +193,6 @@ python consumer.py  # Per consumatore
 
 Distribuito sotto licenza MIT. Vedi `LICENSE` per maggiori informazioni.
 
-## 🙏 Riconoscimenti
-
-- Redis Labs per l'eccellente documentazione
-- Community Python per le librerie utilizzate  
-- Professor/Corso per i requisiti e feedback
-
 ---
 
 ⭐ **Se questo progetto era fatto bene ci lasci un bel voto :D** ⭐
