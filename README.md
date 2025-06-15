@@ -100,17 +100,17 @@ Il sistema supporta canali organizzati gerarchicamente:
 
 ## 📁 Struttura Progetto
 
-```
 redis-notification-system/
-├── __init__.py          # Entry point e launcher
-├── main.py             # Script principale
-├── producer.py         # Applicazione produttore  
-├── consumer.py         # Applicazione consumatore
-├── auth.py             # Sistema autenticazione
-├── database.py         # Gestione Redis e dati
-├── requirements.txt    # Dipendenze Python
-└── README.md          # Questo file
-```
+├── redis_notification_system/
+│   ├── __init__.py
+│   ├── auth.py
+│   ├── consumer.py
+│   ├── database.py
+│   └── producer.py
+├── main.py
+├── requirements.txt
+├── README.md
+└── .gitignore
 
 ## 🛠️ Esempi di Utilizzo
 
