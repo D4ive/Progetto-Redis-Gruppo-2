@@ -1,17 +1,5 @@
 # Documentazione Tecnica - Sistema di Notifiche Redis
 
-## Indice
-
-1. [Panoramica del Progetto](https://claude.ai/chat/950bc282-a3df-4450-8926-0d78aaa0d1d6#panoramica-del-progetto)
-2. [Architettura del Sistema](https://claude.ai/chat/950bc282-a3df-4450-8926-0d78aaa0d1d6#architettura-del-sistema)
-3. [Strutture Dati](https://claude.ai/chat/950bc282-a3df-4450-8926-0d78aaa0d1d6#strutture-dati)
-4. [Implementazione dei Componenti](https://claude.ai/chat/950bc282-a3df-4450-8926-0d78aaa0d1d6#implementazione-dei-componenti)
-5. [Scelte Tecniche](https://claude.ai/chat/950bc282-a3df-4450-8926-0d78aaa0d1d6#scelte-tecniche)
-6. [Gestione degli Errori](https://claude.ai/chat/950bc282-a3df-4450-8926-0d78aaa0d1d6#gestione-degli-errori)
-7. [Guida all'Utilizzo](https://claude.ai/chat/950bc282-a3df-4450-8926-0d78aaa0d1d6#guida-allutilizzo)
-8. [Limitazioni e Miglioramenti Futuri](https://claude.ai/chat/950bc282-a3df-4450-8926-0d78aaa0d1d6#limitazioni-e-miglioramenti-futuri)
-
-## Panoramica del Progetto
 
 Il **Sistema di Notifiche Redis** è un'applicazione distribuita in tempo reale che permette di inviare e ricevere notifiche attraverso canali tematici. Il sistema implementa un pattern Publisher-Subscriber utilizzando Redis come broker di messaggi e sistema di persistenza.
 
